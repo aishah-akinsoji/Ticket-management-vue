@@ -1,55 +1,21 @@
 <template>
   <div id="app">
-    <!-- Navigation always visible -->
-    <Navigation />
-
-    <!-- Toast -->
-    <Toast :toastDisplay="toastDisplay" />
-
-    <!-- Routed pages -->
-    <router-view 
-      :displayToast="displayToast" 
-      :onLogin="handleLogin" 
-      :onLogout="handleLogout"
-    />
-
-    <!-- Footer always visible -->
-    <Footer :isAuthenticated="isAuthenticated" />
+    <router-view />
+    <Toast v-if="toastMessage" :message="toastMessage" :type="toastType" />
   </div>
 </template>
 
-<script setup>
-import { ref } from "vue"
-import { useRouter } from "vue-router"
-import Navigation from "./components/Navigation.vue"
-import Footer from "./components/Footer.vue"
-import Toast from "./components/Toast.vue"
+<script>
+import { ref } from 'vue'
+import Toast from './components/Toast.vue'
 
-const router = useRouter()
+export default {
+  components: { Toast },
+  setup() {
+    const toastMessage = ref('')
+    const toastType = ref('success')
 
-// Auth state
-const isAuthenticated = ref(sessionStorage.getItem("isAuthenticated") === "true")
-const toastDisplay = ref({ display: false, message: "", type: "success" })
-
-// Toast helper
-function displayToast(message, type = "success") {
-  toastDisplay.value = { display: true, message, type }
-  setTimeout(() => toastDisplay.value.display = false, 3000)
-}
-
-// Login & logout handlers
-function handleLogin() {
-  isAuthenticated.value = true
-  sessionStorage.setItem("isAuthenticated", "true")
-}
-
-function handleLogout() {
-  isAuthenticated.value = false
-  sessionStorage.removeItem("isAuthenticated")
-  router.push("/auth/login")
+    return { toastMessage, toastType }
+  }
 }
 </script>
-
-<style>
-/* You said your styles already exist, so no changes here */
-</style>

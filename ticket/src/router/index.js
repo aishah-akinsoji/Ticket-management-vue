@@ -1,21 +1,31 @@
-import { createRouter, createWebHistory } from "vue-router"
+import { createRouter, createWebHistory } from 'vue-router'
+import LandingPage from '../views/LandingPage.vue'
+import AuthPage from '../views/AuthPage.vue'
+import Dashboard from '../views/Dashboard.vue'
+import TicketManagement from '../views/TicketManagement.vue'
 
-// Pages
-import LandingPage from "../components/LandingPage.vue"
-import AuthPage from "../components/AuthPage.vue"
-import Dashboard from "../components/Dashboard.vue"
-import TicketManagement from "../components/TicketManagement.vue"
+const isAuthenticated = () => !!localStorage.getItem('ticketapp_session')
 
 const routes = [
-  { path: "/", component: LandingPage },
-  { path: "/auth/:mode", component: AuthPage, props: true },
-  { path: "/dashboard", component: Dashboard },
-  { path: "/tickets", component: TicketManagement },
+  { path: '/', component: LandingPage, },
+  { path: '/auth/login', component: AuthPage, props: { mode: 'login' } },
+  { path: '/auth/signup', component: AuthPage, props: { mode: 'signup' } },
+  { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true } },
+  { path: '/tickets', component: TicketManagement, meta: { requiresAuth: true } },
+  { path: '/:catchAll(.*)', redirect: '/' }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isAuthenticated()) {
+    next('/auth/login')
+  } else {
+    next()
+  }
 })
 
 export default router
